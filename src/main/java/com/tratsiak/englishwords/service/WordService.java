@@ -6,5 +6,7 @@ import org.springframework.data.domain.Page;
 
 public interface WordService {
 
-    Page<Word> findWord(String partWord, PageInfo pageInfo) throws ServiceException;
+    Page<Word> findWords(String partWord, PageInfo pageInfo) throws ServiceException;
+
+    Word findWordById(long id) throws ServiceException;
 }

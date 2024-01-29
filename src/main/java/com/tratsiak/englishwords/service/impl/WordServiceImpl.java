@@ -22,12 +22,21 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
-    public Page<Word> findWord(String partWord, PageInfo pageInfo) throws ServiceException {
+    public Page<Word> findWords(String partWord, PageInfo pageInfo) throws ServiceException {
         try {
             Pageable pageable = pageInfo.getPageable();
             return wordRepository.findWord(partWord, pageable);
         } catch (DataAccessException e) {
             throw new ServiceException("Can't find words of part", e);
+        }
+    }
+
+    @Override
+    public Word findWordById(long id) throws ServiceException {
+        try {
+            return wordRepository.findWordByIdFetchLerningWord(id);
+        } catch (DataAccessException e) {
+            throw new ServiceException("Can't find word by id", e);
         }
     }
 }

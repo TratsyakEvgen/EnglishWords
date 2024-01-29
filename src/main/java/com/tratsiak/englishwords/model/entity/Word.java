@@ -1,8 +1,10 @@
 package com.tratsiak.englishwords.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.tratsiak.englishwords.util.json.View;
 import jakarta.persistence.*;
 import lombok.*;
+
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,19 +25,23 @@ public class Word implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView({View.Word.class, View.LearningWord.class})
     @Column(name = "words_id")
     private long id;
 
+    @JsonView({View.Word.class, View.LearningWord.class} )
     @Column(name = "english")
     private String english;
 
+    @JsonView({View.Word.class, View.LearningWord.class})
     @Column(name = "transcription")
     private String transcription;
 
+    @JsonView({View.Word.class, View.LearningWord.class})
     @Column(name = "russian")
     private String russian;
 
-    @JsonIgnore
+    @JsonView(View.LearningWord.class)
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private List<LearningWord> learningWord;
 
