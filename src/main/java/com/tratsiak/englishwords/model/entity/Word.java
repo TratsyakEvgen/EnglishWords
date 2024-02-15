@@ -25,25 +25,36 @@ public class Word implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({View.Word.class, View.LearningWord.class})
+    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingEngToRus.class, View.TrainingRusToEng.class})
     @Column(name = "words_id")
     private long id;
 
-    @JsonView({View.Word.class, View.LearningWord.class} )
+    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class} )
     @Column(name = "english")
     private String english;
 
-    @JsonView({View.Word.class, View.LearningWord.class})
+    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class})
     @Column(name = "transcription")
     private String transcription;
 
-    @JsonView({View.Word.class, View.LearningWord.class})
+    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingEngToRus.class})
     @Column(name = "russian")
     private String russian;
 
-    @JsonView(View.LearningWord.class)
+    @Column(name = "sound")
+    private boolean sound;
+
+    @JsonView({View.LearningWord.class})
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private List<LearningWord> learningWord;
+
+
+    @OneToMany(mappedBy = "misspelledWord", fetch = FetchType.LAZY)
+    private List<Mistake> misspelledWords;
+
+    @OneToMany(mappedBy = "wrongWord", fetch = FetchType.LAZY)
+    private List<Mistake> wrongWords;
+
 
     @Override
     public boolean equals(Object o) {

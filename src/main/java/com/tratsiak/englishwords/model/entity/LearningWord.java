@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Getter
@@ -27,10 +28,22 @@ public class LearningWord implements Serializable {
     @JsonView({View.LearningWord.class, View.Word.class})
     private long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "words_id")
     @JsonView(View.Word.class)
     private Word word;
+
+    @Column(name = "count_eng_to_rus")
+    @JsonView(View.Word.class)
+    private byte countCorrectEngToRus;
+
+    @Column(name = "count_rus_to_eng")
+    @JsonView(View.Word.class)
+    private byte countCorrectRusToEng;
+
+    @Column(name = "training_date")
+    @JsonView(View.Word.class)
+    private Timestamp trainingDate;
 
     @Override
     public boolean equals(Object o) {

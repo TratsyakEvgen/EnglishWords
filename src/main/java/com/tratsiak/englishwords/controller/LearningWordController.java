@@ -8,6 +8,7 @@ import com.tratsiak.englishwords.service.LearningWordService;
 import com.tratsiak.englishwords.service.ServiceException;
 import com.tratsiak.englishwords.util.json.PageJsonView;
 import com.tratsiak.englishwords.util.json.View;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class LearningWordController {
     @GetMapping
     @ResponseBody
     @JsonView(View.Word.class)
-    private PageJsonView<LearningWord> getAll(PageInfo pageInfo){
+    private PageJsonView<LearningWord> getAll(@Valid PageInfo pageInfo){
         try {
             Page<LearningWord> page = learningWordService.getAll(pageInfo);
             return new PageJsonView<>(page);
@@ -38,7 +39,6 @@ public class LearningWordController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     private LearningWord create(@RequestBody Word word) {
         try {
             return learningWordService.create(word);
@@ -49,7 +49,6 @@ public class LearningWordController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     private void delete(@PathVariable("id") long id) {
         try {
             learningWordService.delete(id);

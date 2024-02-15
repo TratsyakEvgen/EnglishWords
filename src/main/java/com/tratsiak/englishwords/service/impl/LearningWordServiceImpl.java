@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -46,8 +48,11 @@ public class LearningWordServiceImpl implements LearningWordService {
                 throw new ServiceException("This word is already being studied");
             }
 
-            LearningWord learningWord = LearningWord.builder().word(word).build();
-
+            LearningWord learningWord = LearningWord
+                    .builder()
+                    .word(word)
+                    .trainingDate(Timestamp.valueOf(LocalDateTime.now()))
+                    .build();
             return learningWordRepository.save(learningWord);
         } catch (DataAccessException e) {
             throw new ServiceException("Can't creat new learning word");
