@@ -1,4 +1,4 @@
-package com.tratsiak.englishwords.model.bean.trainig;
+package com.tratsiak.englishwords.model.bean.training;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tratsiak.englishwords.model.entity.LearningWord;
@@ -16,33 +16,33 @@ import java.util.ArrayList;
 @EqualsAndHashCode(callSuper = true)
 @ToString
 @JsonView(View.TrainingEngToRus.class)
-public class TrainingTranslateWordEngToRus extends TrainingTranslateWord implements Serializable {
+public class TrainingTranslateWord extends TrainingTranslateWordRusToEng implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     private String transcription;
 
-    public TrainingTranslateWordEngToRus(LearningWord learningWord) {
+    private boolean sound;
+
+    public TrainingTranslateWord(LearningWord learningWord) {
         this.LearningWordId = learningWord.getId();
         Word word = learningWord.getWord();
         this.translatedWord = word.getEnglish();
-        this.transcription = learningWord.getWord().getTranscription();
+        this.transcription = word.getTranscription();
+        this.sound = word.isSound();
         options = new ArrayList<>();
         options.add(word);
     }
 
     @Override
-    public void setCountIfTrue(LearningWord learningWord) {
-        byte count = learningWord.getCountCorrectEngToRus();
-        if (count < 3) {
-            learningWord.setCountCorrectEngToRus(++count);
-        }
+    public void incCountCorrect(LearningWord learningWord) {
+        int count = learningWord.getCountCorrectEngToRus();
+        learningWord.setCountCorrectEngToRus(++count);
     }
 
     @Override
-    public void setCountIfFalse(LearningWord learningWord) {
-        learningWord.setCountCorrectEngToRus((byte) 0);
+    public void incCountIncorrect(LearningWord learningWord) {
+        int count = learningWord.getCountIncorrectEngToRus();
+        learningWord.setCountIncorrectEngToRus(++count);
     }
-
-
 }

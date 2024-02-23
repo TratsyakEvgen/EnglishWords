@@ -24,23 +24,14 @@ public class WordController {
     public WordController(WordService wordService) {
         this.wordService = wordService;
     }
-    @JsonView(View.Word.class)
+
     @GetMapping
     @ResponseBody
+    @JsonView(View.Word.class)
     private Page<Word> findWords(@RequestParam("part") String partWord, @Valid PageInfo pageInfo) {
         try {
             Page<Word> words = wordService.findWords(partWord, pageInfo);
             return new PageJsonView<>(words);
-        } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        }
-    }
-
-    @JsonView(View.LearningWord.class)
-    @GetMapping("/{id}")
-    private Word findWord(@PathVariable("id") long id){
-        try {
-            return wordService.findWordById(id);
         } catch (ServiceException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }

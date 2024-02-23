@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
@@ -21,9 +19,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "END"
     )
     Page<Word> findWord(String partWord, Pageable pageable);
-
-    @Query("SELECT w FROM Word w LEFT JOIN FETCH w.learningWord WHERE w.id = ?1")
-    Word findWordByIdFetchLerningWord(long id);
 
 }
 

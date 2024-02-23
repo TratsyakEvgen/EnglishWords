@@ -1,4 +1,4 @@
-package com.tratsiak.englishwords.model.bean.trainig;
+package com.tratsiak.englishwords.model.bean.training;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tratsiak.englishwords.model.entity.LearningWord;
@@ -17,7 +17,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @JsonView({View.TrainingRusToEng.class, View.TrainingEngToRus.class})
-public class TrainingTranslateWord implements Serializable {
+public class TrainingTranslateWordRusToEng implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class TrainingTranslateWord implements Serializable {
 
     protected long answer;
 
-    public TrainingTranslateWord(LearningWord learningWord) {
+    public TrainingTranslateWordRusToEng(LearningWord learningWord) {
         this.LearningWordId = learningWord.getId();
         Word word = learningWord.getWord();
         this.translatedWord = word.getRussian();
@@ -37,14 +37,15 @@ public class TrainingTranslateWord implements Serializable {
         options.add(word);
     }
 
-    public void setCountIfTrue(LearningWord learningWord){
-        byte count = learningWord.getCountCorrectRusToEng();
-        if (count < 3) {
-            learningWord.setCountCorrectRusToEng(++count);
-        }
+
+    public void incCountCorrect(LearningWord learningWord) {
+        int count = learningWord.getCountCorrectRusToEng();
+        learningWord.setCountCorrectRusToEng(++count);
     }
 
-    public void setCountIfFalse(LearningWord learningWord){
-        learningWord.setCountCorrectRusToEng((byte) 0);
+
+    public void incCountIncorrect(LearningWord learningWord) {
+        int count = learningWord.getCountIncorrectRusToEng();
+        learningWord.setCountIncorrectRusToEng(++count);
     }
 }

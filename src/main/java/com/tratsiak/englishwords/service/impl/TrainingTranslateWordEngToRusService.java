@@ -1,7 +1,7 @@
 package com.tratsiak.englishwords.service.impl;
 
-import com.tratsiak.englishwords.model.bean.trainig.TrainingTranslateWord;
-import com.tratsiak.englishwords.model.bean.trainig.TrainingTranslateWordEngToRus;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWord;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToEng;
 import com.tratsiak.englishwords.model.entity.LearningWord;
 import com.tratsiak.englishwords.repository.LearningWordRepository;
 import com.tratsiak.englishwords.repository.MistakeRepository;
@@ -12,7 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TrainingTranslateWordEngToRusService extends TrainingTranslateWordServiceImpl {
+public class TrainingTranslateWordEngToRusService extends TrainingTranslateWordRusToEngService {
 
     @Autowired
     public TrainingTranslateWordEngToRusService(LearningWordRepository learningWordRepository,
@@ -22,15 +22,15 @@ public class TrainingTranslateWordEngToRusService extends TrainingTranslateWordS
     }
 
     @Override
-    public TrainingTranslateWord get() throws ServiceException {
+    public TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException {
         try {
             LearningWord learningWord = learningWordRepository
-                    .findWithMinDateAndCountCorrectEngToRusFetchWord()
+                    .findWithMinDateAndCountCorrectEngToRusFetchWord(isLearned)
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
-            TrainingTranslateWord trainingTranslateWord = new TrainingTranslateWordEngToRus(learningWord);
-            return completeTrainingTranslateWord(trainingTranslateWord, learningWord);
+            TrainingTranslateWordRusToEng trainingTranslateWordRusToEng = new TrainingTranslateWord(learningWord);
+            return completeTrainingTranslateWord(trainingTranslateWordRusToEng, learningWord);
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't get training translate word eng to rus");
+            throw new ServiceException("Can't get training translate word eng to rus", e);
         }
     }
 }

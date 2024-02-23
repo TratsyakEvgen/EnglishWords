@@ -9,6 +9,8 @@ public interface LearningWordService {
 
     Page<LearningWord> getAll(PageInfo pageInfo) throws ServiceException;
 
+    LearningWord getByWordId(int id) throws ServiceException;
+
     LearningWord create(Word word) throws ServiceException;
 
     void delete(long id) throws ServiceException;

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+
 @JsonView({View.Word.class, View.LearningWord.class})
 public class PageJsonView<T> implements Page<T> {
     private final Page<T> page;

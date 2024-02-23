@@ -31,12 +31,4 @@ public class WordServiceImpl implements WordService {
         }
     }
 
-    @Override
-    public Word findWordById(long id) throws ServiceException {
-        try {
-            return wordRepository.findWordByIdFetchLerningWord(id);
-        } catch (DataAccessException e) {
-            throw new ServiceException("Can't find word by id", e);
-        }
-    }
 }

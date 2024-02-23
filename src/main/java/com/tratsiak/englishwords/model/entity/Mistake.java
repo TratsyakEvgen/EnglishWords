@@ -1,12 +1,12 @@
 package com.tratsiak.englishwords.model.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.tratsiak.englishwords.util.json.View;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.io.Serial;
 @AllArgsConstructor
 @Entity
 @Table(name = "mistakes")
-public class Mistake {
+public class Mistake implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -24,12 +24,31 @@ public class Mistake {
     @Column(name = "id")
     private long id;
 
-
     @ManyToOne
-    @JoinColumn(name = "misspalled_word")
-    private Word misspelledWord;
+    @JoinColumn(name = "learning_word")
+    private LearningWord learningWord;
 
     @ManyToOne
     @JoinColumn(name = "wrong_word")
     private Word wrongWord;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mistake mistake = (Mistake) o;
+        return id == mistake.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Mistake{" +
+                "id=" + id +
+                '}';
+    }
 }

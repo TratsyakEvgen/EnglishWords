@@ -28,8 +28,8 @@ public class LearningWordController {
 
     @GetMapping
     @ResponseBody
-    @JsonView(View.Word.class)
-    private PageJsonView<LearningWord> getAll(@Valid PageInfo pageInfo){
+    @JsonView(View.LearningWord.class)
+    private PageJsonView<LearningWord> getAll(@Valid PageInfo pageInfo) {
         try {
             Page<LearningWord> page = learningWordService.getAll(pageInfo);
             return new PageJsonView<>(page);
@@ -37,6 +37,17 @@ public class LearningWordController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
+
+    @GetMapping("/{id}")
+    @JsonView(View.LearningWord.class)
+    private LearningWord getByWordId(@PathVariable int id) {
+        try {
+            return learningWordService.getByWordId(id);
+        } catch (ServiceException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
 
     @PostMapping
     private LearningWord create(@RequestBody Word word) {

@@ -5,7 +5,6 @@ import com.tratsiak.englishwords.util.json.View;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -29,7 +28,7 @@ public class Word implements Serializable {
     @Column(name = "words_id")
     private long id;
 
-    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class} )
+    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class})
     @Column(name = "english")
     private String english;
 
@@ -41,16 +40,12 @@ public class Word implements Serializable {
     @Column(name = "russian")
     private String russian;
 
+    @JsonView({View.LearningWord.class, View.TrainingRusToEng.class})
     @Column(name = "sound")
     private boolean sound;
 
-    @JsonView({View.LearningWord.class})
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private List<LearningWord> learningWord;
-
-
-    @OneToMany(mappedBy = "misspelledWord", fetch = FetchType.LAZY)
-    private List<Mistake> misspelledWords;
 
     @OneToMany(mappedBy = "wrongWord", fetch = FetchType.LAZY)
     private List<Mistake> wrongWords;
@@ -76,6 +71,7 @@ public class Word implements Serializable {
                 ", english='" + english + '\'' +
                 ", transcription='" + transcription + '\'' +
                 ", russian='" + russian + '\'' +
+                ", sound=" + sound +
                 '}';
     }
 }

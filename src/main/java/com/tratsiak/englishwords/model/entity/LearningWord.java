@@ -8,6 +8,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -25,25 +26,44 @@ public class LearningWord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "learning_word_id")
-    @JsonView({View.LearningWord.class, View.Word.class})
+    @JsonView({View.LearningWord.class})
     private long id;
 
     @ManyToOne
     @JoinColumn(name = "words_id")
-    @JsonView(View.Word.class)
+    @JsonView({View.LearningWord.class})
     private Word word;
 
-    @Column(name = "count_eng_to_rus")
-    @JsonView(View.Word.class)
-    private byte countCorrectEngToRus;
+    @Column(name = "count_correct_eng_to_rus")
+    @JsonView({View.LearningWord.class})
+    private int countCorrectEngToRus;
 
-    @Column(name = "count_rus_to_eng")
-    @JsonView(View.Word.class)
-    private byte countCorrectRusToEng;
+    @Column(name = "count_incorrect_eng_to_rus")
+    @JsonView({View.LearningWord.class})
+    private int countIncorrectEngToRus;
 
-    @Column(name = "training_date")
-    @JsonView(View.Word.class)
-    private Timestamp trainingDate;
+    @Column(name = "training_eng_to_rus_date")
+    @JsonView({View.LearningWord.class})
+    private Timestamp trainingEngToRusDate;
+
+    @Column(name = "count_correct_rus_to_eng")
+    @JsonView({View.LearningWord.class})
+    private int countCorrectRusToEng;
+
+    @Column(name = "count_incorrect_rus_to_eng")
+    @JsonView({View.LearningWord.class})
+    private int countIncorrectRusToEng;
+
+    @Column(name = "training_rus_to_eng_date")
+    @JsonView({View.LearningWord.class})
+    private Timestamp trainingRusToEngDate;
+
+    @Column(name = "status")
+    @JsonView({View.LearningWord.class})
+    private boolean isLearned;
+
+    @OneToMany(mappedBy = "learningWord", fetch = FetchType.LAZY)
+    private List<Mistake> mistake;
 
     @Override
     public boolean equals(Object o) {
@@ -62,6 +82,13 @@ public class LearningWord implements Serializable {
     public String toString() {
         return "LearningWord{" +
                 "id=" + id +
+                ", countCorrectEngToRus=" + countCorrectEngToRus +
+                ", countIncorrectEngToRus=" + countIncorrectEngToRus +
+                ", trainingEngToRusDate=" + trainingEngToRusDate +
+                ", countCorrectRusToEng=" + countCorrectRusToEng +
+                ", countIncorrectRusToEng=" + countIncorrectRusToEng +
+                ", trainingRusToEngDate=" + trainingRusToEngDate +
+                ", isLearned=" + isLearned +
                 '}';
     }
 }

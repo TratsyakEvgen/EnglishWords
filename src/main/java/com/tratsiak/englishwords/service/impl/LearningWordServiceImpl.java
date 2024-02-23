@@ -9,12 +9,9 @@ import com.tratsiak.englishwords.service.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -34,7 +31,20 @@ public class LearningWordServiceImpl implements LearningWordService {
             Pageable pageable = pageInfo.getPageable();
             return learningWordRepository.findAllFetchAll(pageable);
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't get all learning words");
+            throw new ServiceException("Can't get all learning words", e);
+        }
+    }
+
+    @Override
+    public LearningWord getByWordId(int id) throws ServiceException {
+        try {
+            Optional<LearningWord> optionalLearningWord =
+                    learningWordRepository.findByWord(Word.builder().id(id).build());
+
+            return optionalLearningWord.orElseThrow(() ->
+                    new ServiceException(String.format("Learning word with word id %d not found", id)));
+        } catch (DataAccessException e) {
+            throw new ServiceException("Can't get learning words by word id", e);
         }
     }
 
@@ -42,20 +52,20 @@ public class LearningWordServiceImpl implements LearningWordService {
     public LearningWord create(Word word) throws ServiceException {
         try {
 
-            Optional<LearningWord> optionalLearningWord = learningWordRepository.findLearningWordByWord(word);
+            Optional<LearningWord> optionalLearningWord = learningWordRepository.findByWord(word);
 
             if (optionalLearningWord.isPresent()) {
                 throw new ServiceException("This word is already being studied");
             }
 
+
             LearningWord learningWord = LearningWord
                     .builder()
                     .word(word)
-                    .trainingDate(Timestamp.valueOf(LocalDateTime.now()))
                     .build();
             return learningWordRepository.save(learningWord);
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't creat new learning word");
+            throw new ServiceException("Can't creat new learning word", e);
         }
 
 

@@ -1,10 +1,10 @@
 package com.tratsiak.englishwords.service;
 
-import com.tratsiak.englishwords.model.bean.trainig.TrainingTranslateWord;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToEng;
 
 public interface TrainingTranslateWordService {
 
-    TrainingTranslateWord get() throws ServiceException;
+    TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException;
 
-    long checkAnswer(TrainingTranslateWord trainingTranslateWord) throws ServiceException;
+    long checkAnswer(TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) throws ServiceException;
 }

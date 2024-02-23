@@ -1,8 +1,8 @@
 package com.tratsiak.englishwords.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.tratsiak.englishwords.model.bean.trainig.TrainingTranslateWord;
-import com.tratsiak.englishwords.model.bean.trainig.TrainingTranslateWordEngToRus;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWord;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToEng;
 import com.tratsiak.englishwords.service.ServiceException;
 import com.tratsiak.englishwords.service.TrainingTranslateWordService;
 import com.tratsiak.englishwords.util.json.View;
@@ -28,16 +28,16 @@ public class TrainingEngToRusController {
 
     @GetMapping
     @JsonView(View.TrainingEngToRus.class)
-    private TrainingTranslateWord get() {
+    private TrainingTranslateWordRusToEng get(@RequestParam boolean isLearned) {
         try {
-            return trainingTranslateWordService.get();
+            return trainingTranslateWordService.get(isLearned);
         } catch (ServiceException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
     @PostMapping
-    private long answer(@RequestBody TrainingTranslateWordEngToRus trainingTranslateWordEngToRus) {
+    private long answer(@RequestBody TrainingTranslateWord trainingTranslateWordEngToRus) {
         try {
             return trainingTranslateWordService.checkAnswer(trainingTranslateWordEngToRus);
         } catch (ServiceException e) {
