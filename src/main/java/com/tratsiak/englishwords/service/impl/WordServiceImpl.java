@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class WordServiceImpl implements WordService {
 
@@ -28,6 +30,17 @@ public class WordServiceImpl implements WordService {
             return wordRepository.findWord(partWord, pageable);
         } catch (DataAccessException e) {
             throw new ServiceException("Can't find words of part", e);
+        }
+    }
+
+    @Override
+    public Word getByIdFetchLearningWord(long id) throws ServiceException {
+        try {
+            Optional<Word> optionalWord = wordRepository.findWordByIdFetchLearningWord(id);
+            return optionalWord.orElseThrow(() ->
+                    new ServiceException(String.format("Word with id %d not found", id)));
+        } catch (DataAccessException e) {
+            throw new ServiceException("Can't get words by id", e);
         }
     }
 

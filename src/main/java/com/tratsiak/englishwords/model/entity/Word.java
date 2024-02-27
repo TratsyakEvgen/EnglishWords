@@ -24,26 +24,42 @@ public class Word implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingEngToRus.class, View.TrainingRusToEng.class})
+    @JsonView({View.Word.class,
+            View.LearningWord.class,
+            View.TrainingEngToRus.class,
+            View.TrainingRusToEng.class,
+            View.WordFetchLearningWord.class})
     @Column(name = "words_id")
     private long id;
 
-    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class})
+    @JsonView({View.Word.class,
+            View.LearningWord.class,
+            View.TrainingRusToEng.class,
+            View.WordFetchLearningWord.class})
     @Column(name = "english")
     private String english;
 
-    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingRusToEng.class})
+    @JsonView({View.Word.class,
+            View.LearningWord.class,
+            View.TrainingRusToEng.class,
+            View.WordFetchLearningWord.class})
     @Column(name = "transcription")
     private String transcription;
 
-    @JsonView({View.Word.class, View.LearningWord.class, View.TrainingEngToRus.class})
+    @JsonView({View.Word.class,
+            View.LearningWord.class,
+            View.TrainingEngToRus.class,
+            View.WordFetchLearningWord.class})
     @Column(name = "russian")
     private String russian;
 
-    @JsonView({View.LearningWord.class, View.TrainingRusToEng.class})
+    @JsonView({View.LearningWord.class,
+            View.TrainingRusToEng.class,
+            View.WordFetchLearningWord.class})
     @Column(name = "sound")
     private boolean sound;
 
+    @JsonView({View.WordFetchLearningWord.class})
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private List<LearningWord> learningWord;
 

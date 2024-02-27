@@ -36,23 +36,10 @@ public class LearningWordServiceImpl implements LearningWordService {
     }
 
     @Override
-    public LearningWord getByWordId(int id) throws ServiceException {
-        try {
-            Optional<LearningWord> optionalLearningWord =
-                    learningWordRepository.findByWord(Word.builder().id(id).build());
-
-            return optionalLearningWord.orElseThrow(() ->
-                    new ServiceException(String.format("Learning word with word id %d not found", id)));
-        } catch (DataAccessException e) {
-            throw new ServiceException("Can't get learning words by word id", e);
-        }
-    }
-
-    @Override
     public LearningWord create(Word word) throws ServiceException {
         try {
 
-            Optional<LearningWord> optionalLearningWord = learningWordRepository.findByWord(word);
+            Optional<LearningWord> optionalLearningWord = learningWordRepository.findLearningWordByWord(word);
 
             if (optionalLearningWord.isPresent()) {
                 throw new ServiceException("This word is already being studied");
@@ -69,6 +56,22 @@ public class LearningWordServiceImpl implements LearningWordService {
         }
 
 
+    }
+
+    @Override
+    public LearningWord update(LearningWord learningWord) throws ServiceException {
+        try {
+            Optional<LearningWord> optionalLearningWord = learningWordRepository.findById(learningWord.getId());
+            LearningWord learningWordFromRepository = optionalLearningWord.orElseThrow(
+                    () -> new ServiceException("Learning word not found"));
+
+            learningWordFromRepository.setLearnedStatus(learningWord.isLearnedStatus());
+            learningWordRepository.save(learningWordFromRepository);
+
+            return learningWordFromRepository;
+        } catch (DataAccessException e) {
+            throw new ServiceException("Can't update learning word", e);
+        }
     }
 
     @Override

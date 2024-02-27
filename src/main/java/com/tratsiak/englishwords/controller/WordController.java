@@ -36,4 +36,14 @@ public class WordController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
+
+    @GetMapping("/{id}")
+    @JsonView(View.WordFetchLearningWord.class)
+    private Word getByWordId(@PathVariable("id") long id) {
+        try {
+            return wordService.getByIdFetchLearningWord(id);
+        } catch (ServiceException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
 }

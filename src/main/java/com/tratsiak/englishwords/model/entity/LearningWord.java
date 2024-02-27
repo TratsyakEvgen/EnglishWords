@@ -26,7 +26,8 @@ public class LearningWord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "learning_word_id")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private long id;
 
     @ManyToOne
@@ -35,32 +36,39 @@ public class LearningWord implements Serializable {
     private Word word;
 
     @Column(name = "count_correct_eng_to_rus")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private int countCorrectEngToRus;
 
     @Column(name = "count_incorrect_eng_to_rus")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private int countIncorrectEngToRus;
 
     @Column(name = "training_eng_to_rus_date")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private Timestamp trainingEngToRusDate;
 
     @Column(name = "count_correct_rus_to_eng")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private int countCorrectRusToEng;
 
     @Column(name = "count_incorrect_rus_to_eng")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private int countIncorrectRusToEng;
 
     @Column(name = "training_rus_to_eng_date")
-    @JsonView({View.LearningWord.class})
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
     private Timestamp trainingRusToEngDate;
 
     @Column(name = "status")
-    @JsonView({View.LearningWord.class})
-    private boolean isLearned;
+    @JsonView({View.LearningWord.class,
+            View.WordFetchLearningWord.class})
+    private boolean learnedStatus;
 
     @OneToMany(mappedBy = "learningWord", fetch = FetchType.LAZY)
     private List<Mistake> mistake;
@@ -88,7 +96,7 @@ public class LearningWord implements Serializable {
                 ", countCorrectRusToEng=" + countCorrectRusToEng +
                 ", countIncorrectRusToEng=" + countIncorrectRusToEng +
                 ", trainingRusToEngDate=" + trainingRusToEngDate +
-                ", isLearned=" + isLearned +
+                ", learnedStatus=" + learnedStatus +
                 '}';
     }
 }

@@ -8,4 +8,6 @@ public interface WordService {
 
     Page<Word> findWords(String partWord, PageInfo pageInfo) throws ServiceException;
 
+    Word getByIdFetchLearningWord(long id) throws ServiceException;
+
 }

@@ -18,18 +18,18 @@ public interface LearningWordRepository extends JpaRepository<LearningWord, Long
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word")
     Page<LearningWord> findAllFetchAll(Pageable pageable);
 
-    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.isLearned = ?1 ORDER BY" +
-            " l.countCorrectRusToEng ASC, l.trainingRusToEngDate ASC LIMIT 1")
+    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.learnedStatus = ?1 ORDER BY " +
+            "l.trainingRusToEngDate ASC LIMIT 1")
     Optional<LearningWord> findWithMinDateAndCountCorrectRusToEngFetchWord(boolean isLearned);
 
-    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.isLearned = ?1 ORDER BY" +
-            " l.countCorrectEngToRus ASC, l.trainingRusToEngDate ASC LIMIT 1")
+    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.learnedStatus = ?1 ORDER BY " +
+            "l.trainingEngToRusDate ASC LIMIT 1")
     Optional<LearningWord> findWithMinDateAndCountCorrectEngToRusFetchWord(boolean isLearned);
 
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.id != ?1 ORDER BY RAND()")
     List<LearningWord> findLimitExcludingLearningWord(long id, Limit limit);
 
-    Optional<LearningWord> findByWord(Word word);
+    Optional<LearningWord> findLearningWordByWord(Word word);
 
 
 }

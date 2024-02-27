@@ -63,8 +63,6 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
                     .findById(trainingTranslateWordRusToEng.getLearningWordId())
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
 
-            learningWord.setTrainingRusToEngDate(Timestamp.valueOf(LocalDateTime.now()));
-
             Word word = learningWord.getWord();
             long rightWordId = word.getId();
             long answer = trainingTranslateWordRusToEng.getAnswer();

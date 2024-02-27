@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Getter
@@ -25,7 +27,7 @@ public class TrainingTranslateWord extends TrainingTranslateWordRusToEng impleme
     private boolean sound;
 
     public TrainingTranslateWord(LearningWord learningWord) {
-        this.LearningWordId = learningWord.getId();
+        this.learningWordId = learningWord.getId();
         Word word = learningWord.getWord();
         this.translatedWord = word.getEnglish();
         this.transcription = word.getTranscription();
@@ -38,11 +40,13 @@ public class TrainingTranslateWord extends TrainingTranslateWordRusToEng impleme
     public void incCountCorrect(LearningWord learningWord) {
         int count = learningWord.getCountCorrectEngToRus();
         learningWord.setCountCorrectEngToRus(++count);
+        learningWord.setTrainingEngToRusDate(Timestamp.valueOf(LocalDateTime.now()));
     }
 
     @Override
     public void incCountIncorrect(LearningWord learningWord) {
         int count = learningWord.getCountIncorrectEngToRus();
         learningWord.setCountIncorrectEngToRus(++count);
+        learningWord.setTrainingEngToRusDate(Timestamp.valueOf(LocalDateTime.now()));
     }
 }

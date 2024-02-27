@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class TrainingTranslateWordRusToEng implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    protected long LearningWordId;
+    protected long learningWordId;
 
     protected String translatedWord;
 
@@ -30,7 +32,7 @@ public class TrainingTranslateWordRusToEng implements Serializable {
     protected long answer;
 
     public TrainingTranslateWordRusToEng(LearningWord learningWord) {
-        this.LearningWordId = learningWord.getId();
+        this.learningWordId = learningWord.getId();
         Word word = learningWord.getWord();
         this.translatedWord = word.getRussian();
         options = new ArrayList<>();
@@ -41,11 +43,14 @@ public class TrainingTranslateWordRusToEng implements Serializable {
     public void incCountCorrect(LearningWord learningWord) {
         int count = learningWord.getCountCorrectRusToEng();
         learningWord.setCountCorrectRusToEng(++count);
+        learningWord.setTrainingRusToEngDate(Timestamp.valueOf(LocalDateTime.now()));
     }
 
 
     public void incCountIncorrect(LearningWord learningWord) {
         int count = learningWord.getCountIncorrectRusToEng();
         learningWord.setCountIncorrectRusToEng(++count);
+        learningWord.setTrainingRusToEngDate(Timestamp.valueOf(LocalDateTime.now()));
     }
+
 }
