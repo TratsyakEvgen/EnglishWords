@@ -14,11 +14,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TrainingTranslateWordRusToEngService implements TrainingTranslateWordService {
@@ -43,7 +39,7 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
         try {
 
             LearningWord learningWord = learningWordRepository
-                    .findWithMinDateAndCountCorrectRusToEngFetchWord(isLearned)
+                    .findWithMinDateRusToEngFetchWord(isLearned)
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
 
             TrainingTranslateWordRusToEng trainingTranslateWordRusToEng =
@@ -105,24 +101,27 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
             LearningWord learningWord) {
 
         List<Word> options = trainingTranslateWordRusToEng.getOptions();
-
         List<Mistake> mistakes = learningWord.getMistake();
+        List<Word> words = mistakes.stream().limit(4).map(Mistake::getWrongWord).toList();
+        options.addAll(words);
 
-        if (!mistakes.isEmpty()) {
-            List<Word> words = mistakes.stream().limit(4).map(Mistake::getWrongWord).toList();
-            options.addAll(words);
-        }
 
-        int size = options.size();
-        if (size != 5) {
-            int limit = 5 - size;
-            List<LearningWord> learningWords =
-                    learningWordRepository.findLimitExcludingLearningWord(learningWord.getId(), Limit.of(limit));
-            List<Word> words = learningWords.stream().map(LearningWord::getWord).toList();
-            options.addAll(words);
+        if (options.size() < 5) {
+            Set<Word> optionsSet = new HashSet<>(options);
+
+            List<LearningWord> learningWords = learningWordRepository.findLimitLearningWord(Limit.of(5));
+            List<Word> wordList = new ArrayList<>(learningWords.stream().map(LearningWord::getWord).toList());
+
+            while (optionsSet.size() < 5 & !wordList.isEmpty()) {
+                optionsSet.add(wordList.remove(0));
+            }
+
+            options = new ArrayList<>(optionsSet);
+
         }
 
         Collections.shuffle(options);
+        trainingTranslateWordRusToEng.setOptions(options);
 
         return trainingTranslateWordRusToEng;
     }

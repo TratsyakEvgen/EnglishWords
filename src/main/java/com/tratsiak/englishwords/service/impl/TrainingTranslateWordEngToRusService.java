@@ -25,7 +25,7 @@ public class TrainingTranslateWordEngToRusService extends TrainingTranslateWordR
     public TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException {
         try {
             LearningWord learningWord = learningWordRepository
-                    .findWithMinDateAndCountCorrectEngToRusFetchWord(isLearned)
+                    .findWithMinDateEngToRusFetchWord(isLearned)
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
             TrainingTranslateWordRusToEng trainingTranslateWordRusToEng = new TrainingTranslateWord(learningWord);
             return completeTrainingTranslateWord(trainingTranslateWordRusToEng, learningWord);
