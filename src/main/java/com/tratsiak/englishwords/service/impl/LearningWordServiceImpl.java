@@ -26,20 +26,21 @@ public class LearningWordServiceImpl implements LearningWordService {
 
 
     @Override
-    public Page<LearningWord> getAll(PageInfo pageInfo) throws ServiceException {
+    public Page<LearningWord> getAll(long userId, PageInfo pageInfo) throws ServiceException {
         try {
             Pageable pageable = pageInfo.getPageable();
-            return learningWordRepository.findAllFetchAll(pageable);
+            return learningWordRepository.findAllFetchAll(userId, pageable);
         } catch (DataAccessException e) {
             throw new ServiceException("Can't get all learning words", e);
         }
     }
 
+
     @Override
-    public LearningWord create(Word word) throws ServiceException {
+    public LearningWord create(long userId, long wordId) throws ServiceException {
         try {
 
-            Optional<LearningWord> optionalLearningWord = learningWordRepository.findLearningWordByWord(word);
+            Optional<LearningWord> optionalLearningWord = learningWordRepository.findByUserIdAndWordId(userId, wordId);
 
             if (optionalLearningWord.isPresent()) {
                 throw new ServiceException("This word is already being studied");
@@ -48,7 +49,7 @@ public class LearningWordServiceImpl implements LearningWordService {
 
             LearningWord learningWord = LearningWord
                     .builder()
-                    .word(word)
+                    .word(Word.builder().id(wordId).build())
                     .build();
             return learningWordRepository.save(learningWord);
         } catch (DataAccessException e) {
@@ -59,9 +60,11 @@ public class LearningWordServiceImpl implements LearningWordService {
     }
 
     @Override
-    public LearningWord update(LearningWord learningWord) throws ServiceException {
+    public LearningWord update(long userId, LearningWord learningWord) throws ServiceException {
         try {
-            Optional<LearningWord> optionalLearningWord = learningWordRepository.findById(learningWord.getId());
+            Optional<LearningWord> optionalLearningWord =
+                    learningWordRepository.findByUserIdAndId(userId, learningWord.getId());
+
             LearningWord learningWordFromRepository = optionalLearningWord.orElseThrow(
                     () -> new ServiceException("Learning word not found"));
 
@@ -75,11 +78,13 @@ public class LearningWordServiceImpl implements LearningWordService {
     }
 
     @Override
-    public void delete(long id) throws ServiceException {
+    public void delete(long userId, long id) throws ServiceException {
         try {
-            learningWordRepository.deleteById(id);
+            learningWordRepository.deleteByUserIdAndId(userId, id);
         } catch (DataAccessException e) {
             throw new ServiceException("Can't delete learning word");
         }
     }
+
+
 }

@@ -8,6 +8,7 @@ import com.tratsiak.englishwords.util.json.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,25 +19,27 @@ public class TrainingRusToEngController {
     private final TrainingTranslateWordService trainingTranslateWordService;
 
     @Autowired
-    public TrainingRusToEngController(
-            @Qualifier("trainingTranslateWordRusToEngService") TrainingTranslateWordService trainingTranslateWordService) {
+    public TrainingRusToEngController(@Qualifier("trainingTranslateWordRusToEngService")
+                                      TrainingTranslateWordService trainingTranslateWordService) {
         this.trainingTranslateWordService = trainingTranslateWordService;
     }
 
     @GetMapping
     @JsonView(View.TrainingRusToEng.class)
-    private TrainingTranslateWordRusToEng get(@RequestParam boolean isLearned) {
+    private TrainingTranslateWordRusToEng get(Authentication authentication, @RequestParam boolean isLearned) {
         try {
-            return trainingTranslateWordService.get(isLearned);
+            return trainingTranslateWordService.get((Long) authentication.getPrincipal(), isLearned);
         } catch (ServiceException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
     @PostMapping
-    private long answer(@RequestBody TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) {
+    private long answer(Authentication authentication,
+                        @RequestBody TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) {
         try {
-            return trainingTranslateWordService.checkAnswer(trainingTranslateWordRusToEng);
+            return trainingTranslateWordService
+                    .checkAnswer((Long) authentication.getPrincipal(), trainingTranslateWordRusToEng);
         } catch (ServiceException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }

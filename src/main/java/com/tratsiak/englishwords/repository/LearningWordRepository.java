@@ -1,7 +1,6 @@
 package com.tratsiak.englishwords.repository;
 
 import com.tratsiak.englishwords.model.entity.LearningWord;
-import com.tratsiak.englishwords.model.entity.Word;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,21 +14,24 @@ import java.util.Optional;
 @Repository
 public interface LearningWordRepository extends JpaRepository<LearningWord, Long> {
 
-    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word")
-    Page<LearningWord> findAllFetchAll(Pageable pageable);
+    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word LEFT JOIN FETCH l.mistake WHERE l.user.id = ?1")
+    Page<LearningWord> findAllFetchAll(long userId, Pageable pageable);
 
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word " +
-            "WHERE l.learnedStatus = ?1 ORDER BY l.trainingRusToEngDate ASC LIMIT 1")
-    Optional<LearningWord> findWithMinDateRusToEngFetchWord(boolean isLearned);
+            "WHERE l.user.id = ?1 AND l.learnedStatus = ?2 ORDER BY l.trainingRusToEngDate ASC LIMIT 1")
+    Optional<LearningWord> findWithMinDateRusToEngFetchWord(long userId, boolean isLearned);
 
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word " +
-            "WHERE l.learnedStatus = ?1 ORDER BY l.trainingEngToRusDate ASC LIMIT 1")
-    Optional<LearningWord> findWithMinDateEngToRusFetchWord(boolean isLearned);
+            "WHERE l.user.id = ?1 AND l.learnedStatus = ?2 ORDER BY l.trainingEngToRusDate ASC LIMIT 1")
+    Optional<LearningWord> findWithMinDateEngToRusFetchWord(long userId, boolean isLearned);
 
-    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word ORDER BY RAND()")
-    List<LearningWord> findLimitLearningWord(Limit limit);
+    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.user.id = ?1 ORDER BY RAND()")
+    List<LearningWord> findLimitLearningWordByUserId(long userId, Limit limit);
 
-    Optional<LearningWord> findLearningWordByWord(Word word);
+    Optional<LearningWord> findByUserIdAndWordId(long userId, long learningWordId);
 
+    Optional<LearningWord> findByUserIdAndId(long userId, long learningWordId);
+
+    void deleteByUserIdAndId(long userId, long wordId);
 
 }

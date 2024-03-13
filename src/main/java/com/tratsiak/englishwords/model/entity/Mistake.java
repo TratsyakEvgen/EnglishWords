@@ -3,6 +3,8 @@ package com.tratsiak.englishwords.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -24,11 +26,12 @@ public class Mistake implements Serializable {
     @Column(name = "id")
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "learning_word")
     private LearningWord learningWord;
 
     @ManyToOne
+    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "wrong_word")
     private Word wrongWord;
 

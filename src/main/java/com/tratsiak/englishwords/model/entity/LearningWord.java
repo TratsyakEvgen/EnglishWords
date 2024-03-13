@@ -30,10 +30,14 @@ public class LearningWord implements Serializable {
             View.WordFetchLearningWord.class})
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "words_id")
     @JsonView({View.LearningWord.class})
     private Word word;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "count_correct_eng_to_rus")
     @JsonView({View.LearningWord.class,

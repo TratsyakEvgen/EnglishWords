@@ -4,7 +4,7 @@ import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToE
 
 public interface TrainingTranslateWordService {
 
-    TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException;
+    TrainingTranslateWordRusToEng get(long userId, boolean isLearned) throws ServiceException;
 
-    long checkAnswer(TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) throws ServiceException;
+    long checkAnswer(long userId, TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) throws ServiceException;
 }

@@ -19,6 +19,8 @@ import java.util.*;
 @Service
 public class TrainingTranslateWordRusToEngService implements TrainingTranslateWordService {
 
+    private final static int TOTAL = 5;
+
     protected final LearningWordRepository learningWordRepository;
 
     protected final MistakeRepository mistakeRepository;
@@ -35,11 +37,11 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
     }
 
     @Override
-    public TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException {
+    public TrainingTranslateWordRusToEng get(long userId, boolean isLearned) throws ServiceException {
         try {
 
             LearningWord learningWord = learningWordRepository
-                    .findWithMinDateRusToEngFetchWord(isLearned)
+                    .findWithMinDateRusToEngFetchWord(userId, isLearned)
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
 
             TrainingTranslateWordRusToEng trainingTranslateWordRusToEng =
@@ -53,7 +55,8 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
     }
 
     @Override
-    public long checkAnswer(TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) throws ServiceException {
+    public long checkAnswer(long userId, TrainingTranslateWordRusToEng trainingTranslateWordRusToEng)
+            throws ServiceException {
         try {
             LearningWord learningWord = learningWordRepository
                     .findById(trainingTranslateWordRusToEng.getLearningWordId())
@@ -102,27 +105,47 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
 
         List<Word> options = trainingTranslateWordRusToEng.getOptions();
         List<Mistake> mistakes = learningWord.getMistake();
-        List<Word> words = mistakes.stream().limit(4).map(Mistake::getWrongWord).toList();
+        List<Word> words = mistakes.stream().limit(TOTAL - 1).map(Mistake::getWrongWord).toList();
         options.addAll(words);
 
-
-        if (options.size() < 5) {
+        int size = options.size();
+        if (size < TOTAL) {
             Set<Word> optionsSet = new HashSet<>(options);
 
-            List<LearningWord> learningWords = learningWordRepository.findLimitLearningWord(Limit.of(5));
-            List<Word> wordList = new ArrayList<>(learningWords.stream().map(LearningWord::getWord).toList());
+            List<Word> wordList = wordRepository
+                    .getMistakesByLearningWord(learningWord.getWord().getEnglish(), Limit.of(TOTAL));
+            fillSet(optionsSet, wordList);
 
-            while (optionsSet.size() < 5 & !wordList.isEmpty()) {
-                optionsSet.add(wordList.remove(0));
+            size = optionsSet.size();
+
+
+            if (size < TOTAL) {
+                List<LearningWord> learningWords = learningWordRepository
+                        .findLimitLearningWordByUserId(learningWord.getUser().getId(), Limit.of(TOTAL));
+
+                wordList = new ArrayList<>(learningWords.stream().map(LearningWord::getWord).toList());
+
+                fillSet(optionsSet, wordList);
+                size = optionsSet.size();
             }
 
-            options = new ArrayList<>(optionsSet);
+            if (size < TOTAL) {
+                wordList = wordRepository.findRandom(Limit.of(TOTAL));
 
+                fillSet(optionsSet, wordList);
+            }
+            options = new ArrayList<>(optionsSet);
         }
 
         Collections.shuffle(options);
         trainingTranslateWordRusToEng.setOptions(options);
 
         return trainingTranslateWordRusToEng;
+    }
+
+    private void fillSet(Set<Word> optionsSet, List<Word> wordList) {
+        while (optionsSet.size() < TOTAL & !wordList.isEmpty()) {
+            optionsSet.add(wordList.remove(0));
+        }
     }
 }

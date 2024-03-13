@@ -22,10 +22,10 @@ public class TrainingTranslateWordEngToRusService extends TrainingTranslateWordR
     }
 
     @Override
-    public TrainingTranslateWordRusToEng get(boolean isLearned) throws ServiceException {
+    public TrainingTranslateWordRusToEng get(long userId, boolean isLearned) throws ServiceException {
         try {
             LearningWord learningWord = learningWordRepository
-                    .findWithMinDateEngToRusFetchWord(isLearned)
+                    .findWithMinDateEngToRusFetchWord(userId, isLearned)
                     .orElseThrow(() -> new ServiceException("Learning word not found"));
             TrainingTranslateWordRusToEng trainingTranslateWordRusToEng = new TrainingTranslateWord(learningWord);
             return completeTrainingTranslateWord(trainingTranslateWordRusToEng, learningWord);
