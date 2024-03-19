@@ -1,24 +1,22 @@
-package com.tratsiak.englishwords.service.impl;
+package com.tratsiak.englishwords.service.impl.training;
 
-import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToEng;
+import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWord;
 import com.tratsiak.englishwords.model.entity.LearningWord;
 import com.tratsiak.englishwords.model.entity.Mistake;
 import com.tratsiak.englishwords.model.entity.Word;
 import com.tratsiak.englishwords.repository.LearningWordRepository;
 import com.tratsiak.englishwords.repository.MistakeRepository;
 import com.tratsiak.englishwords.repository.WordRepository;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ErrorMessages;
+import com.tratsiak.englishwords.service.exception.LevelException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.TrainingTranslateWordService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Limit;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
-public class TrainingTranslateWordRusToEngService implements TrainingTranslateWordService {
-
+abstract class TrainingTranslateWordBaseService implements TrainingTranslateWordService {
     private final static int TOTAL = 5;
 
     protected final LearningWordRepository learningWordRepository;
@@ -27,54 +25,45 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
 
     protected final WordRepository wordRepository;
 
-    @Autowired
-    public TrainingTranslateWordRusToEngService(LearningWordRepository learningWordRepository,
-                                                MistakeRepository mistakeRepository,
-                                                WordRepository wordRepository) {
+
+    protected TrainingTranslateWordBaseService(LearningWordRepository learningWordRepository,
+                                               MistakeRepository mistakeRepository,
+                                               WordRepository wordRepository) {
         this.learningWordRepository = learningWordRepository;
         this.mistakeRepository = mistakeRepository;
         this.wordRepository = wordRepository;
     }
 
     @Override
-    public TrainingTranslateWordRusToEng get(long userId, boolean isLearned) throws ServiceException {
-        try {
-
-            LearningWord learningWord = learningWordRepository
-                    .findWithMinDateRusToEngFetchWord(userId, isLearned)
-                    .orElseThrow(() -> new ServiceException("Learning word not found"));
-
-            TrainingTranslateWordRusToEng trainingTranslateWordRusToEng =
-                    new TrainingTranslateWordRusToEng(learningWord);
-
-            return completeTrainingTranslateWord(trainingTranslateWordRusToEng, learningWord);
-
-        } catch (DataAccessException e) {
-            throw new ServiceException("Can't get training translate word rus to eng", e);
-        }
-    }
+    public abstract TrainingTranslateWord get(long userId, boolean isLearned) throws ServiceException;
 
     @Override
-    public long checkAnswer(long userId, TrainingTranslateWordRusToEng trainingTranslateWordRusToEng)
-            throws ServiceException {
+    public long checkAnswer(long userId, TrainingTranslateWord trainingTranslateWord) throws ServiceException {
+
         try {
-            LearningWord learningWord = learningWordRepository
-                    .findById(trainingTranslateWordRusToEng.getLearningWordId())
-                    .orElseThrow(() -> new ServiceException("Learning word not found"));
+            long learningWordId = trainingTranslateWord.getLearningWordId();
+
+            LearningWord learningWord = learningWordRepository.findByUserIdAndId(userId, learningWordId)
+                    .orElseThrow(() -> new ServiceException(LevelException.WARM, ErrorMessages.CHECK_TRAINING,
+                            String.format("Learning word for training %s, for user %d not found",
+                                    trainingTranslateWord, userId)
+                    ));
 
             Word word = learningWord.getWord();
             long rightWordId = word.getId();
-            long answer = trainingTranslateWordRusToEng.getAnswer();
+            long answer = trainingTranslateWord.getAnswer();
 
             if (answer == rightWordId) {
-                trainingTranslateWordRusToEng.incCountCorrect(learningWord);
-
+                trainingTranslateWord.incCountCorrect(learningWord);
             } else {
 
-                trainingTranslateWordRusToEng.incCountIncorrect(learningWord);
+                trainingTranslateWord.incCountIncorrect(learningWord);
 
                 Word wrongWord = wordRepository.findById(answer)
-                        .orElseThrow(() -> new ServiceException("Word not found"));
+                        .orElseThrow(() -> new ServiceException(LevelException.WARM, ErrorMessages.CHECK_TRAINING,
+                                String.format("Word id %d for training %s, for user %d not found",
+                                        answer, trainingTranslateWord, userId)
+                        ));
 
                 Optional<Mistake> optionalMistake =
                         mistakeRepository.findByLearningWordAndWrongWord(learningWord, wrongWord);
@@ -94,16 +83,17 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
             learningWordRepository.save(learningWord);
 
             return rightWordId;
+
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't check answer training translate word rus to eng", e);
+            throw new ServiceException(LevelException.ERROR, ErrorMessages.CHECK_TRAINING,
+                    String.format("Repository exception! User %d, training %s", userId, trainingTranslateWord), e);
         }
     }
 
-    protected TrainingTranslateWordRusToEng completeTrainingTranslateWord(
-            TrainingTranslateWordRusToEng trainingTranslateWordRusToEng,
-            LearningWord learningWord) {
+    protected void completeTrainingTranslateWord(TrainingTranslateWord trainingTranslateWord,
+                                                 LearningWord learningWord) {
 
-        List<Word> options = trainingTranslateWordRusToEng.getOptions();
+        List<Word> options = trainingTranslateWord.getOptions();
         List<Mistake> mistakes = learningWord.getMistake();
         List<Word> words = mistakes.stream().limit(TOTAL - 1).map(Mistake::getWrongWord).toList();
         options.addAll(words);
@@ -138,14 +128,14 @@ public class TrainingTranslateWordRusToEngService implements TrainingTranslateWo
         }
 
         Collections.shuffle(options);
-        trainingTranslateWordRusToEng.setOptions(options);
-
-        return trainingTranslateWordRusToEng;
+        trainingTranslateWord.setOptions(options);
     }
 
     private void fillSet(Set<Word> optionsSet, List<Word> wordList) {
+
         while (optionsSet.size() < TOTAL & !wordList.isEmpty()) {
             optionsSet.add(wordList.remove(0));
         }
     }
+
 }

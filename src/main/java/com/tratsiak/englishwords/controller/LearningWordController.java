@@ -1,10 +1,12 @@
 package com.tratsiak.englishwords.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.tratsiak.englishwords.controller.exception.ExceptionHandler;
 import com.tratsiak.englishwords.model.bean.PageInfo;
 import com.tratsiak.englishwords.model.entity.LearningWord;
+import com.tratsiak.englishwords.model.entity.Word;
 import com.tratsiak.englishwords.service.LearningWordService;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.util.json.PageJsonView;
 import com.tratsiak.englishwords.util.json.View;
 import jakarta.validation.Valid;
@@ -20,10 +22,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class LearningWordController {
 
     private final LearningWordService learningWordService;
+    private final ExceptionHandler exceptionHandler;
 
     @Autowired
-    public LearningWordController(LearningWordService learningWordService) {
+    public LearningWordController(LearningWordService learningWordService, ExceptionHandler exceptionHandler) {
         this.learningWordService = learningWordService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @GetMapping
@@ -34,18 +38,18 @@ public class LearningWordController {
             Page<LearningWord> page = learningWordService.getAll((Long) authentication.getPrincipal(), pageInfo);
             return new PageJsonView<>(page);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 
 
     @PostMapping
     @JsonView(View.LearningWord.class)
-    private LearningWord create(Authentication authentication, @RequestBody long wordId) {
+    private LearningWord create(Authentication authentication, @RequestBody Word word) {
         try {
-            return learningWordService.create((Long) authentication.getPrincipal(), wordId);
+            return learningWordService.create((Long) authentication.getPrincipal(), word);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
 
     }
@@ -56,7 +60,7 @@ public class LearningWordController {
         try {
             return learningWordService.update((Long) authentication.getPrincipal(), learningWord);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
 
     }
@@ -66,7 +70,7 @@ public class LearningWordController {
         try {
             learningWordService.delete((Long) authentication.getPrincipal(), id);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
 
     }

@@ -1,8 +1,9 @@
 package com.tratsiak.englishwords.controller;
 
+import com.tratsiak.englishwords.controller.exception.ExceptionHandler;
 import com.tratsiak.englishwords.model.bean.AuthTelegramApp;
 import com.tratsiak.englishwords.model.bean.Token;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +15,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class TokenController {
 
     private final TokenService tokenService;
+    private final ExceptionHandler exceptionHandler;
 
     @Autowired
-    public TokenController(TokenService tokenService) {
+    public TokenController(TokenService tokenService, ExceptionHandler exceptionHandler) {
         this.tokenService = tokenService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @PostMapping
@@ -25,7 +28,7 @@ public class TokenController {
         try {
             return tokenService.get(auth);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 
@@ -34,7 +37,7 @@ public class TokenController {
         try {
             return tokenService.get(token);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 }

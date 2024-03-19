@@ -1,6 +1,7 @@
 package com.tratsiak.englishwords.config;
 
 import com.tratsiak.englishwords.security.JwtFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,7 @@ public class Config {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/tokens/**").permitAll()
+                                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)

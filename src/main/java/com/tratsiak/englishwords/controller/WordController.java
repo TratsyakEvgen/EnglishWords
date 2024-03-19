@@ -1,9 +1,10 @@
 package com.tratsiak.englishwords.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.tratsiak.englishwords.controller.exception.ExceptionHandler;
 import com.tratsiak.englishwords.model.bean.PageInfo;
 import com.tratsiak.englishwords.model.entity.Word;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.WordService;
 import com.tratsiak.englishwords.util.json.PageJsonView;
 import com.tratsiak.englishwords.util.json.View;
@@ -19,10 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class WordController {
 
     private final WordService wordService;
+    private final ExceptionHandler exceptionHandler;
 
     @Autowired
-    public WordController(WordService wordService) {
+    public WordController(WordService wordService, ExceptionHandler exceptionHandler) {
         this.wordService = wordService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @GetMapping
@@ -33,7 +36,7 @@ public class WordController {
             Page<Word> words = wordService.findWords(partWord, pageInfo);
             return new PageJsonView<>(words);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 
@@ -43,7 +46,7 @@ public class WordController {
         try {
             return wordService.getByIdFetchLearningWord(id);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 }

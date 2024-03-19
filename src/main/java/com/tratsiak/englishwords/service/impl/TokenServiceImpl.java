@@ -7,7 +7,9 @@ import com.tratsiak.englishwords.model.entity.User;
 import com.tratsiak.englishwords.repository.UserRepository;
 import com.tratsiak.englishwords.security.JwtProvider;
 import com.tratsiak.englishwords.security.JwtProviderException;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ErrorMessages;
+import com.tratsiak.englishwords.service.exception.LevelException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.TokenService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +43,15 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token get(AuthTelegramApp auth) throws ServiceException {
-        if (!auth.getUsername().equals(usernameTelegramApp) ||
-                !passwordEncoder.matches(auth.getPassword(), passwordTelegramApp)) {
-            throw new ServiceException("Not valid password or username");
-        }
 
         long telegramId = auth.getTelegramId();
+
+        if (!auth.getUsername().equals(usernameTelegramApp) ||
+                !passwordEncoder.matches(auth.getPassword(), passwordTelegramApp)) {
+            throw new ServiceException(LevelException.WARM, ErrorMessages.AUTH,
+                    String.format("Incorrect auth data telegram app for telegram id %d", telegramId)
+            );
+        }
 
         User user = userRepository.findByTelegramId(telegramId);
 
@@ -63,16 +68,22 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token get(Auth auth) throws ServiceException {
+
         return null;
     }
 
     @Override
     public Token get(Token token) throws ServiceException {
+
+        String refresh = token.getRefresh();
+
         try {
-            Claims claims = jwtProvider.getRefreshClaims(token.getRefresh());
+            Claims claims = jwtProvider.getRefreshClaims(refresh);
             token.setAccess(jwtProvider.generateAccessToken(claims.get("id", Long.class)));
+
         } catch (JwtProviderException e) {
-            throw new ServiceException("Not valid refresh token", e);
+            throw new ServiceException(LevelException.WARM, ErrorMessages.REFRESH_TOKEN,
+                    String.format("Incorrect refresh token %s", refresh), e);
         }
 
         return token;

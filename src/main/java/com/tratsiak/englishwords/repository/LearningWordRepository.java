@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface LearningWordRepository extends JpaRepository<LearningWord, Long> {
 
-    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word LEFT JOIN FETCH l.mistake WHERE l.user.id = ?1")
+    @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.user.id = ?1")
     Page<LearningWord> findAllFetchAll(long userId, Pageable pageable);
 
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word " +
@@ -28,10 +28,10 @@ public interface LearningWordRepository extends JpaRepository<LearningWord, Long
     @Query("SELECT l FROM LearningWord l LEFT JOIN FETCH l.word WHERE l.user.id = ?1 ORDER BY RAND()")
     List<LearningWord> findLimitLearningWordByUserId(long userId, Limit limit);
 
-    Optional<LearningWord> findByUserIdAndWordId(long userId, long learningWordId);
+    Optional<LearningWord> findByUserIdAndWordId(long userId, long WordId);
 
     Optional<LearningWord> findByUserIdAndId(long userId, long learningWordId);
 
-    void deleteByUserIdAndId(long userId, long wordId);
+    void deleteById(long id);
 
 }

@@ -44,11 +44,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims claims = jwtProvider.getAccessClaims(token);
                 SecurityContextHolder.getContext().setAuthentication(
                         new JwtAuthentication(true, claims.get("id", Long.class)));
+
             } catch (JwtProviderException ignored) {
+
             }
         }
 
         filterChain.doFilter(request, response);
+
+
     }
 
 

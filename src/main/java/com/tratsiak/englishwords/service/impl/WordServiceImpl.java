@@ -3,15 +3,14 @@ package com.tratsiak.englishwords.service.impl;
 import com.tratsiak.englishwords.model.bean.PageInfo;
 import com.tratsiak.englishwords.model.entity.Word;
 import com.tratsiak.englishwords.repository.WordRepository;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ErrorMessages;
+import com.tratsiak.englishwords.service.exception.LevelException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class WordServiceImpl implements WordService {
@@ -25,22 +24,27 @@ public class WordServiceImpl implements WordService {
 
     @Override
     public Page<Word> findWords(String partWord, PageInfo pageInfo) throws ServiceException {
+
         try {
-            Pageable pageable = pageInfo.getPageable();
-            return wordRepository.findWord(partWord, pageable);
+            return wordRepository.findWord(partWord, pageInfo.getPageable());
+
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't find words of part", e);
+            throw new ServiceException(LevelException.ERROR, ErrorMessages.WORD_NOT_FOUND,
+                    String.format("Repository exception! Part word %s, page info %s", partWord, pageInfo), e);
         }
     }
 
     @Override
     public Word getByIdFetchLearningWord(long id) throws ServiceException {
+
         try {
-            Optional<Word> optionalWord = wordRepository.findWordByIdFetchLearningWord(id);
-            return optionalWord.orElseThrow(() ->
-                    new ServiceException(String.format("Word with id %d not found", id)));
+            return wordRepository.findWordByIdFetchLearningWord(id)
+                    .orElseThrow(() -> new ServiceException(LevelException.WARM, ErrorMessages.WORD_NOT_FOUND,
+                            String.format("Word with id %d not found", id)));
+
         } catch (DataAccessException e) {
-            throw new ServiceException("Can't get words by id", e);
+            throw new ServiceException(LevelException.ERROR, ErrorMessages.WORD_NOT_FOUND,
+                    String.format("Repository exception! Word id %d", id), e);
         }
     }
 

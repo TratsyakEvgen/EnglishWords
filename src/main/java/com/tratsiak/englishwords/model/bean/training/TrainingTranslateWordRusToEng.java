@@ -6,30 +6,17 @@ import com.tratsiak.englishwords.model.entity.Word;
 import com.tratsiak.englishwords.util.json.View;
 import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
-@JsonView({View.TrainingRusToEng.class, View.TrainingEngToRus.class})
-public class TrainingTranslateWordRusToEng implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    protected long learningWordId;
-
-    protected String translatedWord;
-
-    protected List<Word> options;
-
-    protected long answer;
+@JsonView({View.TrainingRusToEng.class})
+public class TrainingTranslateWordRusToEng extends TrainingTranslateWord {
 
     public TrainingTranslateWordRusToEng(LearningWord learningWord) {
         this.learningWordId = learningWord.getId();
@@ -39,14 +26,14 @@ public class TrainingTranslateWordRusToEng implements Serializable {
         options.add(word);
     }
 
-
+    @Override
     public void incCountCorrect(LearningWord learningWord) {
         int count = learningWord.getCountCorrectRusToEng();
         learningWord.setCountCorrectRusToEng(++count);
         learningWord.setTrainingRusToEngDate(Timestamp.valueOf(LocalDateTime.now()));
     }
 
-
+    @Override
     public void incCountIncorrect(LearningWord learningWord) {
         int count = learningWord.getCountIncorrectRusToEng();
         learningWord.setCountIncorrectRusToEng(++count);

@@ -1,12 +1,12 @@
 package com.tratsiak.englishwords.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.tratsiak.englishwords.controller.exception.ExceptionHandler;
 import com.tratsiak.englishwords.model.bean.training.TrainingTranslateWordRusToEng;
-import com.tratsiak.englishwords.service.ServiceException;
+import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.TrainingTranslateWordService;
 import com.tratsiak.englishwords.util.json.View;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,32 +16,33 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/trainingsRusToEng")
 public class TrainingRusToEngController {
 
-    private final TrainingTranslateWordService trainingTranslateWordService;
-
+    private final TrainingTranslateWordService trainingTranslateWordRusToEngService;
+    private final ExceptionHandler exceptionHandler;
     @Autowired
-    public TrainingRusToEngController(@Qualifier("trainingTranslateWordRusToEngService")
-                                      TrainingTranslateWordService trainingTranslateWordService) {
-        this.trainingTranslateWordService = trainingTranslateWordService;
+    public TrainingRusToEngController(TrainingTranslateWordService trainingTranslateWordRusToEngService,
+                                      ExceptionHandler exceptionHandler) {
+        this.trainingTranslateWordRusToEngService = trainingTranslateWordRusToEngService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     @GetMapping
     @JsonView(View.TrainingRusToEng.class)
     private TrainingTranslateWordRusToEng get(Authentication authentication, @RequestParam boolean isLearned) {
         try {
-            return trainingTranslateWordService.get((Long) authentication.getPrincipal(), isLearned);
+            long userId = (Long) authentication.getPrincipal();
+            return (TrainingTranslateWordRusToEng) trainingTranslateWordRusToEngService.get(userId, isLearned);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 
     @PostMapping
-    private long answer(Authentication authentication,
-                        @RequestBody TrainingTranslateWordRusToEng trainingTranslateWordRusToEng) {
+    private long answer(Authentication authentication, @RequestBody TrainingTranslateWordRusToEng rusToEng) {
         try {
-            return trainingTranslateWordService
-                    .checkAnswer((Long) authentication.getPrincipal(), trainingTranslateWordRusToEng);
+            long userId = (Long) authentication.getPrincipal();
+            return trainingTranslateWordRusToEngService.checkAnswer(userId, rusToEng);
         } catch (ServiceException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+            throw exceptionHandler.handle(e);
         }
     }
 }

@@ -1,52 +1,31 @@
 package com.tratsiak.englishwords.model.bean.training;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.tratsiak.englishwords.model.entity.LearningWord;
 import com.tratsiak.englishwords.model.entity.Word;
-import com.tratsiak.englishwords.util.json.View;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @ToString
-@JsonView(View.TrainingEngToRus.class)
-public class TrainingTranslateWord extends TrainingTranslateWordRusToEng implements Serializable {
+public abstract class TrainingTranslateWord implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String transcription;
+    protected long learningWordId;
+    protected String translatedWord;
+    protected List<Word> options;
+    protected long answer;
 
-    private boolean sound;
+    public abstract void incCountCorrect(LearningWord learningWord);
 
-    public TrainingTranslateWord(LearningWord learningWord) {
-        this.learningWordId = learningWord.getId();
-        Word word = learningWord.getWord();
-        this.translatedWord = word.getEnglish();
-        this.transcription = word.getTranscription();
-        this.sound = word.isSound();
-        options = new ArrayList<>();
-        options.add(word);
-    }
-
-    @Override
-    public void incCountCorrect(LearningWord learningWord) {
-        int count = learningWord.getCountCorrectEngToRus();
-        learningWord.setCountCorrectEngToRus(++count);
-        learningWord.setTrainingEngToRusDate(Timestamp.valueOf(LocalDateTime.now()));
-    }
-
-    @Override
-    public void incCountIncorrect(LearningWord learningWord) {
-        int count = learningWord.getCountIncorrectEngToRus();
-        learningWord.setCountIncorrectEngToRus(++count);
-        learningWord.setTrainingEngToRusDate(Timestamp.valueOf(LocalDateTime.now()));
-    }
+    public abstract void incCountIncorrect(LearningWord learningWord);
 }
