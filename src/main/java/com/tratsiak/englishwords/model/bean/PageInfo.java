@@ -1,5 +1,6 @@
 package com.tratsiak.englishwords.model.bean;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class PageInfo implements Serializable {
     @Min(value = 1, message = "The page size must be >0")
     private int size;
 
+    @Hidden
     public Pageable getPageable() {
         return PageRequest.of(page, size);
     }

@@ -28,6 +28,12 @@ public class User implements Serializable {
     @Column(name = "telegram_id")
     private long telegramId;
 
+    @Column(name = "login")
+    private String login;
+
+    @Column(name = "password")
+    private String password;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     List<LearningWord> learningWords;
 

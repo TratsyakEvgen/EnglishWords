@@ -7,10 +7,10 @@ import com.tratsiak.englishwords.model.entity.Word;
 import com.tratsiak.englishwords.repository.LearningWordRepository;
 import com.tratsiak.englishwords.repository.MistakeRepository;
 import com.tratsiak.englishwords.repository.WordRepository;
+import com.tratsiak.englishwords.service.TrainingTranslateWordService;
 import com.tratsiak.englishwords.service.exception.ErrorMessages;
 import com.tratsiak.englishwords.service.exception.LevelException;
 import com.tratsiak.englishwords.service.exception.ServiceException;
-import com.tratsiak.englishwords.service.TrainingTranslateWordService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Limit;
 

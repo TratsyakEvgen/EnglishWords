@@ -63,6 +63,7 @@ public class Word implements Serializable {
     @OneToMany(mappedBy = "word", fetch = FetchType.LAZY)
     private List<LearningWord> learningWord;
 
+    @JsonView
     @OneToMany(mappedBy = "wrongWord", fetch = FetchType.LAZY)
     private List<Mistake> wrongWords;
 

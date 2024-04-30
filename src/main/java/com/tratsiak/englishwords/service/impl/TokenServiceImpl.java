@@ -7,10 +7,10 @@ import com.tratsiak.englishwords.model.entity.User;
 import com.tratsiak.englishwords.repository.UserRepository;
 import com.tratsiak.englishwords.security.JwtProvider;
 import com.tratsiak.englishwords.security.JwtProviderException;
+import com.tratsiak.englishwords.service.TokenService;
 import com.tratsiak.englishwords.service.exception.ErrorMessages;
 import com.tratsiak.englishwords.service.exception.LevelException;
 import com.tratsiak.englishwords.service.exception.ServiceException;
-import com.tratsiak.englishwords.service.TokenService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +21,8 @@ import org.springframework.stereotype.Service;
 public class TokenServiceImpl implements TokenService {
 
     private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
-
     private final String usernameTelegramApp;
     private final String passwordTelegramApp;
 
@@ -69,7 +67,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token get(Auth auth) throws ServiceException {
 
-        return null;
+        User user = userRepository.findByLogin(auth.getLogin());
+
+        if (user == null || !passwordEncoder.matches(auth.getPassword(), user.getPassword())) {
+            throw new ServiceException(LevelException.INFO, ErrorMessages.AUTH);
+        }
+
+        return Token.builder()
+                .access(jwtProvider.generateAccessToken(user.getId()))
+                .refresh(jwtProvider.generateRefreshToken(user.getId()))
+                .build();
     }
 
     @Override

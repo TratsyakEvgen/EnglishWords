@@ -37,6 +37,7 @@ public class LearningWord implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonView
     private User user;
 
     @Column(name = "count_correct_eng_to_rus")
@@ -75,6 +76,7 @@ public class LearningWord implements Serializable {
     private boolean learnedStatus;
 
     @OneToMany(mappedBy = "learningWord", fetch = FetchType.LAZY)
+    @JsonView
     private List<Mistake> mistake;
 
     @Override

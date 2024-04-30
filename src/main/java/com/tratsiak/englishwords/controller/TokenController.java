@@ -1,43 +1,47 @@
 package com.tratsiak.englishwords.controller;
 
-import com.tratsiak.englishwords.controller.exception.ExceptionHandler;
+import com.tratsiak.englishwords.model.bean.Auth;
 import com.tratsiak.englishwords.model.bean.AuthTelegramApp;
 import com.tratsiak.englishwords.model.bean.Token;
-import com.tratsiak.englishwords.service.exception.ServiceException;
 import com.tratsiak.englishwords.service.TokenService;
+import com.tratsiak.englishwords.service.exception.ServiceException;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/tokens")
 public class TokenController {
 
     private final TokenService tokenService;
-    private final ExceptionHandler exceptionHandler;
 
     @Autowired
-    public TokenController(TokenService tokenService, ExceptionHandler exceptionHandler) {
+    public TokenController(TokenService tokenService) {
+
         this.tokenService = tokenService;
-        this.exceptionHandler = exceptionHandler;
     }
+
+    @Operation(summary = "Авторизация")
+
+
+    @PostMapping("/login")
+    private Token getToken(@RequestBody @Valid Auth auth) throws ServiceException {
+
+        return tokenService.get(auth);
+    }
+
 
     @PostMapping
-    private Token getTokenForTelegram(@RequestBody AuthTelegramApp auth) {
-        try {
-            return tokenService.get(auth);
-        } catch (ServiceException e) {
-            throw exceptionHandler.handle(e);
-        }
+    private Token getTokenForTelegram(@RequestBody AuthTelegramApp auth) throws ServiceException {
+
+        return tokenService.get(auth);
     }
 
+
     @PutMapping
-    private Token getNewToken(@RequestBody Token token) {
-        try {
-            return tokenService.get(token);
-        } catch (ServiceException e) {
-            throw exceptionHandler.handle(e);
-        }
+    private Token getNewToken(@RequestBody Token token) throws ServiceException {
+
+        return tokenService.get(token);
     }
 }

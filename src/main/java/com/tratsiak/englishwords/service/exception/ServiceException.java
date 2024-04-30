@@ -15,6 +15,12 @@ public class ServiceException extends Exception {
         this.publicMessage = publicMessage;
     }
 
+    public ServiceException(LevelException levelException, String publicMessage) {
+        super(publicMessage);
+        this.levelException = levelException;
+        this.publicMessage = publicMessage;
+    }
+
     public ServiceException(LevelException levelException, String publicMessage, String message, Throwable cause) {
         super(message, cause);
         this.levelException = levelException;
